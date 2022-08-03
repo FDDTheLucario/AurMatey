@@ -16,6 +16,7 @@ object PkgHandler {
         httpClient.execute(packageToFind).use { resp ->
             val respBody = JSONObject(EntityUtils.toString(resp.entity)).get("results");
             println(respBody);
+          
             val packages = Json.decodeFromString<List<Package>>(respBody.toString());
             for (pkg in packages) println("Package name: ${pkg.Name}");
         }
