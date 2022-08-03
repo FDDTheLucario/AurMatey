@@ -1,6 +1,5 @@
-import util.PkgHandler
+import util.PkgHandler;
 
 fun main(args: Array<String>) {
-    println(args[0]);
-
+    PkgHandler.findPackage(args[0]);
 }
