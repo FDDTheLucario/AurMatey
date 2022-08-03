@@ -17,8 +17,9 @@
  */
 
 
-import util.PkgHandler;
+package dtos;
 
-fun main(args: Array<String>) {
-    PkgHandler.searchForPackage(args[0]);
-}
+import kotlinx.serialization.Serializable;
+
+@Serializable
+data class RawPackage(val Description: String, val FirstSubmitted: Long, val ID: Int, val LastModified: Long, val Maintainer: String?, val Name: String, val NumVotes: Int, val OutOfDate: Long?, val PackageBase: String, val PackageBaseID: Int, val Popularity: Float, val URL: String?, val URLPath: String, val Version: String)
