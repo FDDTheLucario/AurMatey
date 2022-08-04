@@ -17,7 +17,7 @@
  */
 
 package dtos;
-import java.time.*;
+import util.Formatting.toDate;
 class Package(private val rawPackage: RawPackage) {
     val description = rawPackage.Description;
     val submissionDate = toDate(rawPackage.FirstSubmitted);
@@ -28,11 +28,6 @@ class Package(private val rawPackage: RawPackage) {
     val repoUrl = rawPackage.URL ?: "No URL";
     val aurUrl = "https://aur.archlinux.org${rawPackage.URLPath}";
     val version = rawPackage.Version;
-    private fun toDate(epoch: Long): String {
-        return Instant.ofEpochSecond(epoch)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime().toString();
-    }
 
     fun getBasicInfo():String {
         return "${packageName}-${version}" +

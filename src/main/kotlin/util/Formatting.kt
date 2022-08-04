@@ -16,20 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package util;
 
-import util.PkgHandler;
+import java.time.Instant;
+import java.time.ZoneId;
 
-fun main(args: Array<String>) {
-    val option = args[0];
-    when (option) {
-        "-s" -> { // search
-            val packageToFind = args[1];
-            if (packageToFind.isEmpty()) {
-                println("aurmatey: error: must provide package name");
-            } else {
-                val packages = PkgHandler.searchForPackage(packageToFind);
-                println("aurmatey: found ${packages.size} results. show?");
-            }
-        }
+object Formatting {
+    fun toDate(epoch: Long): String {
+        return Instant.ofEpochSecond(epoch)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime().toString();
     }
 }

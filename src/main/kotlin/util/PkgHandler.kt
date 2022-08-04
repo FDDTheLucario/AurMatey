@@ -17,7 +17,6 @@
  */
 
 package util;
-import dtos.Package
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients;
@@ -25,6 +24,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject
 import kotlinx.serialization.json.Json;
 import dtos.RawPackage;
+import dtos.RawPackageInfo
+import errors.PackageNotFoundError
 import kotlinx.serialization.decodeFromString
 
 
@@ -34,11 +35,18 @@ object PkgHandler {
         val packageToFind = HttpGet("https://aur.archlinux.org/rpc/?v=5&type=search&arg=${packageName}");
         httpClient.execute(packageToFind).use { resp ->
             val respBody = JSONObject(EntityUtils.toString(resp.entity)).get("results");
+            if (respBody.toString() == "[]") throw PackageNotFoundError(); // jank! should ideally check if this is empty.
             return Json.decodeFromString(respBody.toString());
         }
     }
-    fun getPackage(packageName: String): Package {
-        //TODO implement
-        throw NotImplementedError();
+    fun findPackage(packageName: String): List<RawPackageInfo> {
+        val packageToFind = HttpGet("https://aur.archlinux.org/rpc/?v=5&type=info&arg=${packageName}");
+        httpClient.execute(packageToFind).use { resp ->
+            val respBody = JSONObject(EntityUtils.toString(resp.entity)).get("results");
+            println(respBody);
+            if (respBody.toString() == "[]") throw PackageNotFoundError();
+            println(respBody.toString().length);
+            return Json.decodeFromString(respBody.toString());
+        }
     }
 }
