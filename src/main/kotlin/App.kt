@@ -20,8 +20,7 @@
 import util.PkgHandler;
 
 fun main(args: Array<String>) {
-    val option = args[0];
-    when (option) {
+    when (args[0]) {
         "-s" -> { // search
             val packageToFind = args[1];
             if (packageToFind.isEmpty()) {

@@ -32,7 +32,7 @@ import kotlinx.serialization.decodeFromString
 object PkgHandler {
     private val httpClient: CloseableHttpClient = HttpClients.createDefault();
     fun searchForPackage(packageName: String): List<RawPackage> {
-        val packageToFind = HttpGet("https://aur.archlinux.org/rpc/?v=5&type=search&arg=${packageName}");
+        val packageToFind = HttpGet("https://aur.archlinux.org/rpc/?v=5&type=search&arg=$packageName");
         httpClient.execute(packageToFind).use { resp ->
             val respBody = JSONObject(EntityUtils.toString(resp.entity)).get("results");
             if (respBody.toString() == "[]") throw PackageNotFoundError(); // jank! should ideally check if this is empty.

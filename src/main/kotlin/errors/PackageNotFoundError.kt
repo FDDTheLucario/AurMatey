@@ -18,4 +18,4 @@
 
 package errors
 
-class PackageNotFoundError: Exception("This package does not exist");
+class PackageNotFoundError: Exception("No package found");
