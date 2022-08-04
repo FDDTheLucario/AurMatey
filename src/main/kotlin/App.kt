@@ -17,18 +17,48 @@
  */
 
 
+import dtos.Package
+import errors.PackageNotFoundError
 import util.PkgHandler;
+import java.util.*
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     when (args[0]) {
         "-s" -> { // search
-            val packageToFind = args[1];
-            if (packageToFind.isEmpty()) {
-                println("aurmatey: error: must provide package name");
-            } else {
-                val packages = PkgHandler.searchForPackage(packageToFind);
-                println("aurmatey: found ${packages.size} results. show?");
+                search(args[1]);
             }
+        }
+    }
+fun search(name: String) {
+    if (name.isEmpty()) {
+        println("aurmatey: error: must provide package name");
+    } else {
+        try {
+            val packages = PkgHandler.searchForPackage(name);
+            print("aurmatey: found ${packages.size} results. show? [Y/n] ");
+            val input = readln();
+            when (input.lowercase(Locale.getDefault())) {
+                "y" -> {
+                    for (pkg in packages) {
+                        println(Package(pkg).getBasicInfo() + "\n"); // how could i implement pagination?
+                    }
+                }
+                "n" -> {
+                    exitProcess(0);
+                }
+                "" -> {
+                    for (pkg in packages) {
+                        println(Package(pkg).getBasicInfo() + "\n"); // how could i implement pagination?
+                    }
+                }
+                else -> {
+                    println("aurmatey: invalid option. aborting...");
+                    exitProcess(1);
+                }
+            }
+        } catch (e: PackageNotFoundError) {
+            println("aurmatey: no packages found");
         }
     }
 }

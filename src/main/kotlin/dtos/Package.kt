@@ -19,7 +19,7 @@
 package dtos;
 import util.Formatting.toDate;
 class Package(private val rawPackage: RawPackage) {
-    val description = rawPackage.Description;
+    val description = rawPackage.Description ?: "No description";
     val submissionDate = toDate(rawPackage.FirstSubmitted);
     val lastModified = toDate(rawPackage.LastModified);
     val maintainer = rawPackage.Maintainer ?: "No maintainer";
