@@ -18,6 +18,7 @@
 
 
 import dtos.Package
+import dtos.RawPackage
 import errors.PackageNotFoundError
 import util.Formatting
 import util.PkgHandler;
@@ -38,22 +39,17 @@ fun search(name: String) {
         try {
             val packages = PkgHandler.searchForPackage(name);
             print("aurmatey: found ${packages.size} results. show? [Y/n] ");
-            val pages = Formatting.pages(packages, 10);
+            val pages = Formatting.pages(packages);
             val input = readln();
             when (input.lowercase(Locale.getDefault())) {
                 "y" -> {
-                    for (pkg in packages) {
-                        println(Package(pkg).getBasicInfo() + "\n"); // how could i implement pagination?
-                        println("Debugging: ${pages.size}")
-                    }
+                    list(packages);
                 }
                 "n" -> {
                     exitProcess(0);
                 }
                 "" -> {
-                    for (pkg in packages) {
-                        println(Package(pkg).getBasicInfo() + "\n"); // how could i implement pagination?
-                    }
+                    list(packages);
                 }
                 else -> {
                     println("aurmatey: invalid option. aborting...");
@@ -64,4 +60,36 @@ fun search(name: String) {
             println("aurmatey: no packages found");
         }
     }
+}
+fun listPage(packages: List<RawPackage>, page: Int) {
+    val packagePage = Formatting.pages(packages);
+    val maxPages = packagePage.size - 1;
+    var currentPage = page;
+    if (page > maxPages || page < 0) currentPage = 0;
+    println("showing page ${currentPage + 1} of ${packagePage.size}");
+    for (pkg in packagePage[currentPage]) println("${Package(pkg).getBasicInfo()}\n");
+}
+
+fun listPackages(packages: List<RawPackage>) {
+    var input = readln();
+    val maxPages = Formatting.pages(packages).size;
+    while (input.lowercase(Locale.getDefault()) != "x") {
+        try {
+            if (input.toInt() > maxPages || input.toInt() < 1) input = "1";
+            listPage(packages, input.toInt() - 1);
+            print("[${input.toInt()}/$maxPages] (x to exit) ");
+            listPackages(packages);
+        } catch (e: NumberFormatException) {
+            listPage(packages, 0);
+            print("[1/$maxPages] (x to exit) ");
+            listPackages(packages);
+        }
+    }
+    if (input.lowercase(Locale.getDefault()) == "x") exitProcess(0);
+}
+fun list(packages: List<RawPackage>) {
+
+    listPage(packages, 0);
+    print("[1/${Formatting.pages(packages).size}] (x to exit) ");
+    listPackages(packages);
 }

@@ -30,7 +30,7 @@ object Formatting {
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime().toString();
     }
-    fun pages(sourceList: List<RawPackage>, size: Int): List<List<RawPackage>> {
-        return sourceList.chunked(size);
+    fun pages(sourceList: List<RawPackage>): List<List<RawPackage>> {
+        return sourceList.chunked(10);
     }
 }
