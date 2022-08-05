@@ -18,13 +18,19 @@
 
 package util;
 
+import dtos.RawPackage
+import dtos.RawPackageInfo
 import java.time.Instant;
 import java.time.ZoneId;
+import kotlin.math.ceil
 
 object Formatting {
     fun toDate(epoch: Long): String {
         return Instant.ofEpochSecond(epoch)
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime().toString();
+    }
+    fun pages(sourceList: List<RawPackage>, size: Int): List<List<RawPackage>> {
+        return sourceList.chunked(size);
     }
 }

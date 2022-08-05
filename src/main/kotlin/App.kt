@@ -19,6 +19,7 @@
 
 import dtos.Package
 import errors.PackageNotFoundError
+import util.Formatting
 import util.PkgHandler;
 import java.util.*
 import kotlin.system.exitProcess
@@ -37,11 +38,13 @@ fun search(name: String) {
         try {
             val packages = PkgHandler.searchForPackage(name);
             print("aurmatey: found ${packages.size} results. show? [Y/n] ");
+            val pages = Formatting.pages(packages, 10);
             val input = readln();
             when (input.lowercase(Locale.getDefault())) {
                 "y" -> {
                     for (pkg in packages) {
                         println(Package(pkg).getBasicInfo() + "\n"); // how could i implement pagination?
+                        println("Debugging: ${pages.size}")
                     }
                 }
                 "n" -> {
