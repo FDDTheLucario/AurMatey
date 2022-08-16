@@ -19,9 +19,11 @@
 
 import dtos.Package
 import dtos.RawPackage
+import dtos.RawPackageInfo
 import errors.PackageNotFoundError
 import util.Formatting
 import util.PkgHandler;
+import util.PkgHandler.getMissingDependencies
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -30,6 +32,8 @@ fun main(args: Array<String>) {
         "-s" -> { // search
                 search(args[1]);
             }
+        "-S" -> { installPackage(PkgHandler.findPackage(args[1])[0]) }
+
         }
     }
 fun search(name: String) {
@@ -88,8 +92,16 @@ fun listPackages(packages: List<RawPackage>) {
     if (input.lowercase(Locale.getDefault()) == "x") exitProcess(0);
 }
 fun list(packages: List<RawPackage>) {
-
     listPage(packages, 0);
     print("[1/${Formatting.pages(packages).size}] (x to exit) ");
     listPackages(packages);
+}
+fun installPackage(pkg: RawPackageInfo) {
+    val missingDeps = pkg.getMissingDependencies(pkg);
+    if (missingDeps.size == 0) {
+        println("required dependencies all there");
+    } else {
+        val dependencies = missingDeps.joinToString(separator = " ");
+        println("${pkg.Name} requires the following dependencies: $dependencies");
+    }
 }

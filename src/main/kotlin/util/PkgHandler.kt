@@ -17,36 +17,62 @@
  */
 
 package util;
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.lordcodes.turtle.ShellRunException
+import com.lordcodes.turtle.shellRun
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONObject
+import org.json.JSONObject;
 import kotlinx.serialization.json.Json;
 import dtos.RawPackage;
-import dtos.RawPackageInfo
-import errors.PackageNotFoundError
-import kotlinx.serialization.decodeFromString
+import dtos.RawPackageInfo;
+import errors.PackageNotFoundError;
+import jdk.internal.org.objectweb.asm.TypeReference
+import kotlinx.serialization.decodeFromString;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 object PkgHandler {
     private val httpClient: CloseableHttpClient = HttpClients.createDefault();
+    private val mapper = jacksonObjectMapper();
     fun searchForPackage(packageName: String): List<RawPackage> {
         val packageToFind = HttpGet("https://aur.archlinux.org/rpc/?v=5&type=search&arg=$packageName");
         httpClient.execute(packageToFind).use { resp ->
-            val respBody = JSONObject(EntityUtils.toString(resp.entity)).get("results");
-            if (respBody.toString() == "[]") throw PackageNotFoundError(); // jank! should ideally check if this is empty.
-            return Json.decodeFromString(respBody.toString());
+            val respBody = JSONObject(EntityUtils.toString(resp.entity)).get("results").toString();
+            if (respBody == "[]") throw PackageNotFoundError(); // jank! should ideally check if this is empty.
+            return mapper.readValue(respBody);
         }
     }
     fun findPackage(packageName: String): List<RawPackageInfo> {
         val packageToFind = HttpGet("https://aur.archlinux.org/rpc/?v=5&type=info&arg=${packageName}");
         httpClient.execute(packageToFind).use { resp ->
-            val respBody = JSONObject(EntityUtils.toString(resp.entity)).get("results");
+            val respBody = JSONObject(EntityUtils.toString(resp.entity)).get("results").toString();
             println(respBody);
-            if (respBody.toString() == "[]") throw PackageNotFoundError();
-            println(respBody.toString().length);
-            return Json.decodeFromString(respBody.toString());
+            if (respBody == "[]") throw PackageNotFoundError();
+            return mapper.readValue(respBody);
         }
+    }
+    fun RawPackageInfo.getMissingDependencies(pkg: RawPackageInfo): ArrayList<String> {
+        val missingDependencies = ArrayList<String>();
+        for (dependency in pkg.Depends) {
+            try {
+                val output = shellRun("pacman", listOf("-Q", dependency))
+            } catch (e: ShellRunException) {
+                if ("not found" in e.errorText) {
+                    missingDependencies.add(dependency);
+                } else {
+                    println("catastrophic failure");
+                }
+            }
+        }
+        return missingDependencies;
     }
 }
