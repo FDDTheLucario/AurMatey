@@ -22,7 +22,7 @@ import kotlinx.serialization.Serializable;
 
 @Serializable
 data class RawPackageInfo(val Conflicts: Array<String>?,
-                          val Depends: Array<String>,
+                          val Depends: Array<String>?,
                           val Description: String,
                           val FirstSubmitted: Long,
                           val ID: Int,

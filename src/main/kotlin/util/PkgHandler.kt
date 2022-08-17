@@ -20,7 +20,6 @@ package util;
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.lordcodes.turtle.ShellRunException
 import com.lordcodes.turtle.shellRun
@@ -60,11 +59,15 @@ object PkgHandler {
             return mapper.readValue(respBody);
         }
     }
-    fun RawPackageInfo.getMissingDependencies(pkg: RawPackageInfo): ArrayList<String> {
+    fun RawPackageInfo.getMissingDependencies(): ArrayList<String> {
+
         val missingDependencies = ArrayList<String>();
-        for (dependency in pkg.Depends) {
+        if (this.Depends == null) {
+            return missingDependencies;
+        }
+        this.Depends.forEach { dependency ->
             try {
-                val output = shellRun("pacman", listOf("-Q", dependency))
+                shellRun("pacman", listOf("-Q", dependency))
             } catch (e: ShellRunException) {
                 if ("not found" in e.errorText) {
                     missingDependencies.add(dependency);

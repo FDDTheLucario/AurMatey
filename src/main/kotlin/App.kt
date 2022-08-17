@@ -97,11 +97,11 @@ fun list(packages: List<RawPackage>) {
     listPackages(packages);
 }
 fun installPackage(pkg: RawPackageInfo) {
-    val missingDeps = pkg.getMissingDependencies(pkg);
+    val missingDeps = pkg.getMissingDependencies();
     if (missingDeps.size == 0) {
         println("required dependencies all there");
     } else {
-        val dependencies = missingDeps.joinToString(separator = " ");
+        val dependencies = missingDeps.joinToString(separator = ", ");
         println("${pkg.Name} requires the following dependencies: $dependencies");
     }
 }
